@@ -4,18 +4,19 @@
 # Build tools
 NASM = nasm -f bin 
 
-
+N?=421633
 # =============================================================================
 # Tasks
 
 all: clean build test
 
 .tmp/boot.bin: src/boot.asm
-	$(NASM) src/boot.asm -o .tmp/boot.bin
+	$(NASM) src/boot.asm -o .tmp/boot.bin -dN=$(N)
 
 boot.img: .tmp/boot.bin
 	dd if=/dev/zero of=boot.img bs=1024 count=1440
 	dd if=.tmp/boot.bin of=boot.img conv=notrunc
+	dd if=foo.txt of=boot.img conv=notrunc seek=1
 
 build: boot.img
 
