@@ -5,6 +5,7 @@
 cli
 xor ax, ax ; ax = 0
 mov ss, ax ; stack segment = 0
+mov ds, ax
 mov sp, 0x7C00 ; stack pointer
 
 mov si, SECTORS
@@ -36,7 +37,7 @@ mov cl, 1 ; sector [0; 17]
 
 
   dec si
-  jz infloop
+  jz setup_pm
   jmp .loop
 
 .change_cylinder:
@@ -60,8 +61,62 @@ mov cl, 1 ; sector [0; 17]
   int 0x10
   jmp .disk_error
 
+
+setup_pm:
+  lgdt [gdt_descriptor]
+  cld
+
+  mov eax, cr0
+  or eax, 0x1
+  mov cr0, eax
+
+  jmp 0x8:next
+
+
+[BITS 32]
+next:
+
+mov ax, 0x10
+mov ds, ax
+mov ss, ax
+mov es, ax
+mov fs, ax
+mov gs, ax
+
+[EXTERN kernel_entry]
+call kernel_entry
+
+
+[GLOBAL infloop]
 infloop:
   jmp infloop
+
+align 8
+
+gdt_start:
+null_descriptor:
+  dq 0x0
+
+code_descriptor:
+  dw 0xFFFF
+  dw 0x0
+  db 0x0
+  db 10011010b
+  db 11001111b
+  db 0x0
+
+data_descriptor:
+  dw 0xFFFF
+  dw 0x0
+  db 0x0
+  db 10010010b
+  db 11001111b
+  db 0x0
+
+gdt_end:
+gdt_descriptor:
+  dw gdt_end - gdt_start - 1
+  dd gdt_start
 
 times 510-($-$$) db 0
 dw 0xAA55
