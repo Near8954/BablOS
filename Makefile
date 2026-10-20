@@ -4,26 +4,31 @@
 # Build tools
 NASM = nasm -felf
 CC = gcc
-CFLAGS = 	-std=c99 -m32 -O2 -ffreestanding -no-pie -fno-pie -mno-sse -fno-stack-protector
+CFLAGS =  -std=c99 -m32 -O2 -ffreestanding -no-pie -fno-pie -mno-sse -fno-stack-protector
 LD = ld
 LDFLAGS = -m elf_i386 -T link.ld
 OBJCOPY = objcopy
+
+# Modules
+KERNEL_OBJS = .tmp/kernel.o .tmp/vga_driver.o .tmp/memutils.o
 
 # =============================================================================
 # Tasks
 
 all: clean build test
 
-.tmp/kernel.o: src/kernel.c
-	$(CC) $(CFLAGS) -c src/kernel.c -o .tmp/kernel.o
+# Шаблонное правило для компиляции всех .c файлов в .o
+.tmp/%.o: src/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
-.tmp/boot.o: src/boot.asm
-	@KSIZE=$$(stat -c %s .tmp/kernel.o); \
+# boot.o теперь зависит от всех файлов ядра, чтобы посчитать их суммарный размер
+.tmp/boot.o: src/boot.asm $(KERNEL_OBJS)
+	@KSIZE=$$(cat $(KERNEL_OBJS) | wc -c); \
 	TOTAL=$$((KSIZE + 512)); \
 	$(NASM) src/boot.asm -o .tmp/boot.o -dN=$$TOTAL
 
-.tmp/os.elf: .tmp/boot.o .tmp/kernel.o
-	$(LD) $(LDFLAGS) .tmp/boot.o .tmp/kernel.o -o .tmp/os.elf
+.tmp/os.elf: .tmp/boot.o $(KERNEL_OBJS)
+	$(LD) $(LDFLAGS) .tmp/boot.o $(KERNEL_OBJS) -o .tmp/os.elf
 
 .tmp/os.bin: .tmp/os.elf
 	$(OBJCOPY) -O binary .tmp/os.elf .tmp/os.bin
@@ -40,10 +45,10 @@ clean:
 	mkdir -p .tmp
 
 test: build
-	qemu-system-i386 -cpu pentium2 -m 1g -fda boot.img -monitor stdio -device VGA
+	qemu-system-i386 -cpu pentium2 -m 1g -drive file=boot.img,format=raw,if=floppy -monitor stdio -device VGA -display vnc=127.0.0.1:0 -audiodev none,id=snd0
 
 debug: build
-	qemu-system-i386 -cpu pentium2 -m 1g -fda boot.img -monitor stdio -device VGA -s -S &
-	gdb
+	qemu-system-i386 -cpu pentium2 -m 1g -drive file=boot.img,format=raw,if=floppy -monitor stdio -device VGA -display vnc=127.0.0.1:0 -s -S &
+	gdb .tmp/os.elf
 
 .PHONY: all build clean test debug
