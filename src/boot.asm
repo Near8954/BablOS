@@ -86,6 +86,10 @@ mov gs, ax
 [EXTERN kernel_entry]
 call kernel_entry
 
+[GLOBAL cli]
+cli:
+  cli
+  ret
 
 [GLOBAL infloop]
 infloop:

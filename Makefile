@@ -10,7 +10,7 @@ LDFLAGS = -m elf_i386 -T link.ld
 OBJCOPY = objcopy
 
 # Modules
-KERNEL_OBJS = .tmp/kernel.o .tmp/vga_driver.o .tmp/memutils.o .tmp/printf.o
+KERNEL_OBJS = .tmp/kernel.o .tmp/vga_driver.o .tmp/memutils.o .tmp/printf.o .tmp/kernel_panic.o .tmp/allocator.o
 
 # =============================================================================
 # Tasks
