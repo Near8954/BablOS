@@ -17,11 +17,9 @@ KERNEL_OBJS = .tmp/kernel.o .tmp/vga_driver.o .tmp/memutils.o .tmp/printf.o .tmp
 
 all: clean build test
 
-# Шаблонное правило для компиляции всех .c файлов в .o
 .tmp/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# boot.o теперь зависит от всех файлов ядра, чтобы посчитать их суммарный размер
 .tmp/boot.o: src/boot.asm $(KERNEL_OBJS)
 	@KSIZE=$$(cat $(KERNEL_OBJS) | wc -c); \
 	TOTAL=$$((KSIZE + 512)); \
