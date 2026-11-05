@@ -16,7 +16,7 @@ static inline void* align_up(void* ptr, size_t align) {
 void* malloc_undead(size_t size, size_t alignment) {
   char* ptr = align_up(cur, alignment);
   if (ptr + size > ARENA_END) {
-    return NULL;
+    return NULL; // kernel_panic
   }
   cur = ptr + size;
   return (void*)ptr;
@@ -25,7 +25,7 @@ void* malloc_undead(size_t size, size_t alignment) {
 void* calloc_undead(size_t size, size_t alignment) {
   void* ptr = malloc_undead(size, alignment);
   if (ptr == NULL) {
-    return NULL;
+    return NULL; // delete
   }
   memzero(ptr, size);
   return ptr;

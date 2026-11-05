@@ -1,3 +1,4 @@
 .tmp
 *.txt
 boot.img
+compile_commands.json

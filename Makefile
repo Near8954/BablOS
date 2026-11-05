@@ -43,10 +43,10 @@ clean:
 	mkdir -p .tmp
 
 test: build
-	qemu-system-i386 -cpu pentium2 -m 1g -drive file=boot.img,format=raw,if=floppy -monitor stdio -device VGA -display vnc=127.0.0.1:0 -audiodev none,id=snd0
+	qemu-system-i386 -cpu pentium2 -m 1g -drive file=boot.img,format=raw,if=floppy -monitor stdio -device VGA -display curses -audiodev none,id=snd0
 
 debug: build
-	qemu-system-i386 -cpu pentium2 -m 1g -drive file=boot.img,format=raw,if=floppy -monitor stdio -device VGA -display vnc=127.0.0.1:0 -s -S &
+	qemu-system-i386 -cpu pentium2 -m 1g -drive file=boot.img,format=raw,if=floppy -monitor stdio -device VGA -display curses -s -S &
 	gdb .tmp/os.elf
 
 .PHONY: all build clean test debug
