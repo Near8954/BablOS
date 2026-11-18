@@ -1,5 +1,6 @@
 #include "allocator.h"
 #include "memutils.h"
+#include "kernel_panic.h"
 
 #define ARENA_START ((char*)0x100000)
 #define ARENA_SIZE 0x100000
@@ -16,7 +17,7 @@ static inline void* align_up(void* ptr, size_t align) {
 void* malloc_undead(size_t size, size_t alignment) {
   char* ptr = align_up(cur, alignment);
   if (ptr + size > ARENA_END) {
-    return NULL; // kernel_panic
+    kernel_panic("Not enough memory to malloc in undead arena");
   }
   cur = ptr + size;
   return (void*)ptr;
@@ -24,9 +25,6 @@ void* malloc_undead(size_t size, size_t alignment) {
 
 void* calloc_undead(size_t size, size_t alignment) {
   void* ptr = malloc_undead(size, alignment);
-  if (ptr == NULL) {
-    return NULL; // delete
-  }
   memzero(ptr, size);
   return ptr;
 }

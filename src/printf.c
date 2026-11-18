@@ -67,28 +67,19 @@ static void print_int(int val) {
 }
 
 static void print_hex(unsigned int val) {
-  char buf[16];
-  char* ptr = buf + sizeof(buf) - 1;
-  *ptr = '\0';
+  char buf[8];
   const char hex_nums[] = "0123456789abcdef";
 
-  if (val == 0) {
-    --ptr;
-    *ptr = '0';
-  } else {
-    while (val > 0) {
-      --ptr;
-      *ptr = hex_nums[val % 16];
-      val /= 16;
-    }
+  for (int i = 7; i >= 0; --i) {
+    buf[i] = hex_nums[val & 0xF];
+    val >>= 4;
   }
 
-  --ptr;
-  *ptr = 'x';
-  --ptr;
-  *ptr = '0';
+  print_string("0x");
 
-  print_string(ptr);
+  for (int i = 0; i < 8; ++i) {
+    print_sym(buf[i]);
+  }
 }
 
 void vprintf(const char* fmt, va_list args) {

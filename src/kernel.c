@@ -1,6 +1,7 @@
 #include "printf.h"
 #include "allocator.h"
 #include "kernel_panic.h"
+#include "universal_handler.h"
 void infloop();
 
 void test() {
@@ -21,6 +22,7 @@ void test() {
 }
 
 void kernel_entry() {
-  test();
+  init_interrupts();
+  exp1();
   infloop();
 }

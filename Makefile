@@ -10,7 +10,7 @@ LDFLAGS = -m elf_i386 -T link.ld
 OBJCOPY = objcopy
 
 # Modules
-KERNEL_OBJS = .tmp/kernel.o .tmp/vga_driver.o .tmp/memutils.o .tmp/printf.o .tmp/kernel_panic.o .tmp/allocator.o
+KERNEL_OBJS = .tmp/kernel.o .tmp/vga_driver.o .tmp/memutils.o .tmp/printf.o .tmp/kernel_panic.o .tmp/allocator.o .tmp/universal_handler.o .tmp/interrupts.o
 
 # =============================================================================
 # Tasks
@@ -20,10 +20,11 @@ all: clean build test
 .tmp/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+.tmp/interrupts.o: src/interrupts.asm
+	$(NASM) $< -o $@
+
 .tmp/boot.o: src/boot.asm $(KERNEL_OBJS)
-	@KSIZE=$$(cat $(KERNEL_OBJS) | wc -c); \
-	TOTAL=$$((KSIZE + 512)); \
-	$(NASM) src/boot.asm -o .tmp/boot.o -dN=$$TOTAL
+	@KSIZE=$$(cat $(KERNEL_OBJS) | wc -c); 	TOTAL=$$((KSIZE + 512)); 	$(NASM) src/boot.asm -o .tmp/boot.o -dN=$$TOTAL
 
 .tmp/os.elf: .tmp/boot.o $(KERNEL_OBJS)
 	$(LD) $(LDFLAGS) .tmp/boot.o $(KERNEL_OBJS) -o .tmp/os.elf
