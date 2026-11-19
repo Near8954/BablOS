@@ -41,6 +41,12 @@ typedef struct {
 } interrupt_descriptor;
 #pragma pack(pop)
 
+_Static_assert(sizeof(context) == 68, "context size mismatch");
+
+_Static_assert(sizeof(idtr) == 6, "idtr size mismatch");
+
+_Static_assert(sizeof(interrupt_descriptor) == 8, "interrupt_descriptor size mismatch");
+
 void idt_set_gate(uint8_t vector, uint32_t handler);
 
 void init_interrupts();

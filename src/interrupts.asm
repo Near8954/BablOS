@@ -5,8 +5,8 @@
     global isr%1
 
 isr%1:
-    push dword 0       ; фиктивный error_code
-    push dword %1      ; номер вектора
+    push dword 0       ; default error_code
+    push dword %1      ; vector number
     jmp save_context
 %endmacro
 
@@ -14,7 +14,7 @@ isr%1:
     global isr%1
 
 isr%1:
-    push dword %1      ; номер вектора
+    push dword %1      ; vector number
     jmp save_context
 %endmacro
 

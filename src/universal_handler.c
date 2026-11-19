@@ -8,7 +8,7 @@ void idt_set_gate(uint8_t vector, uint32_t handler) {
   IDT[vector].offset1 = handler & 0xFFFF;
   IDT[vector].segment_selector = 0x08;
   IDT[vector].reserved = 0;
-  IDT[vector].type= 0x8E;
+  IDT[vector].type= 0x8E; // present 1 dpl 00 fixed 0 D 1 Type 110
   IDT[vector].offset2 = (handler >> 16) & 0xFFFF;
 }
 
